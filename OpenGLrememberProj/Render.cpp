@@ -308,6 +308,7 @@ void initRender(OpenGL *ogl)
 
 void figure(double**);
 double* rotMatrix(double*, double*, double);
+void CalcNormal(double x1[3], double x2[3], double x3[3], double* n);
 
 
 void Render(OpenGL *ogl)
@@ -364,34 +365,34 @@ void Render(OpenGL *ogl)
 	double V8[] = { -3, 5, 0 };
 	double V9[] = { -1, -1, 0 };
 
-	double inFan0[] = { 0, 0, 0 };
-	double inFan1[] = { 0, 0, 0 };
-	double inFan2[] = { 0, 0, 0 };
-	double inFan3[] = { 0, 0, 0 };
-	double inFan4[] = { 0, 0, 0 };
-	double inFan5[] = { 0, 0, 0 };
-	double inFan6[] = { 0, 0, 0 };
-	double inFan7[] = { 0, 0, 0 };
-	double inFan8[] = { 0, 0, 0 };
-	double inFan9[] = { 0, 0, 0 };
-	double inFan10[] = { 0, 0, 0 };
-
-	double outFan0[] = { 0, 0, 0 };
-	double outFan1[] = { 0, 0, 0 };
-	double outFan2[] = { 0, 0, 0 };
-	double outFan3[] = { 0, 0, 0 };
-	double outFan4[] = { 0, 0, 0 };
-	double outFan5[] = { 0, 0, 0 };
-	double outFan6[] = { 0, 0, 0 };
-	double outFan7[] = { 0, 0, 0 };
-	double outFan8[] = { 0, 0, 0 };
-	double outFan9[] = { 0, 0, 0 };
-	double outFan10[] = { 0, 0, 0 };
+	//double inFan0[] = { 0, 0, 0 };
+	//double inFan1[] = { 0, 0, 0 };
+	//double inFan2[] = { 0, 0, 0 };
+	//double inFan3[] = { 0, 0, 0 };
+	//double inFan4[] = { 0, 0, 0 };
+	//double inFan5[] = { 0, 0, 0 };
+	//double inFan6[] = { 0, 0, 0 };
+	//double inFan7[] = { 0, 0, 0 };
+	//double inFan8[] = { 0, 0, 0 };
+	//double inFan9[] = { 0, 0, 0 };
+	//double inFan10[] = { 0, 0, 0 };
+	//
+	//double outFan0[] = { 0, 0, 0 };
+	//double outFan1[] = { 0, 0, 0 };
+	//double outFan2[] = { 0, 0, 0 };
+	//double outFan3[] = { 0, 0, 0 };
+	//double outFan4[] = { 0, 0, 0 };
+	//double outFan5[] = { 0, 0, 0 };
+	//double outFan6[] = { 0, 0, 0 };
+	//double outFan7[] = { 0, 0, 0 };
+	//double outFan8[] = { 0, 0, 0 };
+	//double outFan9[] = { 0, 0, 0 };
+	//double outFan10[] = { 0, 0, 0 };
 
 	double* C0[] = { V0, V1, V2, V3, V4, V5, V6, V7, V8, V9 };
 
-	double* fan1[] = { inFan0, inFan1, inFan2, inFan3, inFan4, inFan5, inFan6, inFan7, inFan8, inFan9, inFan10 };
-	double* fan2[] = { outFan0, outFan1, outFan2, outFan3, outFan4, outFan5, outFan6, outFan7, outFan8, outFan9, inFan10 };
+	//double* fan1[] = { inFan0, inFan1, inFan2, inFan3, inFan4, inFan5, inFan6, inFan7, inFan8, inFan9, inFan10 };
+	//double* fan2[] = { outFan0, outFan1, outFan2, outFan3, outFan4, outFan5, outFan6, outFan7, outFan8, outFan9, inFan10 };
 
 	double rotV0[] = { 2, 5, 0 };
 	double rotV1[] = { -12.5, -3, 0 };
@@ -400,6 +401,7 @@ void Render(OpenGL *ogl)
 	double* pointMod;
 	int i = 0;
 	double n[3];
+	double p1[3], p2[3], p3[3];
 
 	double offset = 7;
 
@@ -414,71 +416,130 @@ void Render(OpenGL *ogl)
 	figure(C0);
 	glPopMatrix();
 
-	glBegin(GL_QUAD_STRIP);
+	glBegin(GL_QUADS);
 
 	glColor3d(0.2, 0.2, 0.4);
 
-	for (int i = 0; i <= 5; i++)
+	for (int i = 0; i < 8; i++)
 	{
+		p1[0] = C0[i][0];
+		p1[1] = C0[i][1];
+		p1[2] = C0[i][2];
+
+		p2[0] = C0[i][0];
+		p2[1] = C0[i][1];
+		p2[2] = C0[i][2] + offset;
+
+		p3[0] = C0[i + 1][0];
+		p3[1] = C0[i + 1][1];
+		p3[2] = C0[i + 1][2] + offset;
+
+		CalcNormal(p2, p1, p3, n);
+		n[0] *= (-1);
+		n[1] *= (-1);
+		glNormal3dv(n);
+		glVertex3dv(C0[i]);
+		C0[i][2] += offset;
+		glVertex3dv(C0[i]);
+		C0[i][2] -= offset;
 		C0[i+1][2] += offset;
-		n[0] = C0[i][1] * C0[i+1][2] - C0[i][1] * C0[i+1][2];
-		n[1] = -C0[i][0] * C0[i+1][2] + C0[i][0] * C0[i+1][2];
-		n[2] = C0[i][0] * C0[i+1][1] - C0[i][0] * C0[i+1][1];
+		glVertex3dv(C0[i+1]);
 		C0[i+1][2] -= offset;
-		glVertex3dv(C0[i]);
-		C0[i][2] += offset;
-		glVertex3dv(C0[i]);
-		C0[i][2] -= offset;
+		glVertex3dv(C0[i + 1]);
 	}
 
-	glColor3d(0.4, 0.4, 0.4);
-	
-	for (rot = angle; rot < 67.3801350520; rot += angle)
-	{
-		fan2[i] = rotMatrix(C0[5], rotV1, rot);
-		fan2[i + 1][2] += offset;
-		n[0] = fan2[i][1] * fan2[i + 1][2] - fan2[i][1] * fan2[i + 1][2];
-		n[1] = -fan2[i][0] * fan2[i + 1][2] + fan2[i][0] * fan2[i + 1][2];
-		n[2] = fan2[i][0] * fan2[i + 1][1] - fan2[i][0] * fan2[i + 1][1];
-		fan2[i + 1][2] -= offset;
-		glVertex3dv(fan2[i]);
-		fan2[i][2] += offset;
-		glVertex3dv(fan2[i]);
-		fan2[i][2] -= offset;
-	}
-	
-	glColor3d(0.2, 0.2, 0.4);
-	
-	for (int i = 6; i <= 8; i++)
-	{
-		C0[i + 1][2] += offset;
-		n[0] = C0[i][1] * C0[i + 1][2] - C0[i][1] * C0[i + 1][2];
-		n[1] = -C0[i][0] * C0[i + 1][2] + C0[i][0] * C0[i + 1][2];
-		n[2] = C0[i][0] * C0[i + 1][1] - C0[i][0] * C0[i + 1][1];
-		C0[i + 1][2] -= offset;
-		glVertex3dv(C0[i]);
-		C0[i][2] += offset;
-		glVertex3dv(C0[i]);
-		C0[i][2] -= offset;
-	}
-	
-	glColor3d(0.4, 0.4, 0.4);
-	
-	for (rot = 0; rot <= 180; rot += 18)
-	{
-		fan1[i] = rotMatrix(C0[0], rotV0, rot);
-		fan1[i + 1][2] += offset;
-		n[0] = fan1[i][1] * fan1[i + 1][2] - fan1[i][1] * fan1[i + 1][2];
-		n[1] = -fan1[i][0] * fan1[i + 1][2] + fan1[i][0] * fan1[i + 1][2];
-		n[2] = fan1[i][0] * fan1[i + 1][1] - fan1[i][0] * fan1[i + 1][1];
-		fan1[i + 1][2] -= offset;
-		glVertex3dv(fan1[i]);
-		fan1[i][2] += offset;
-		glVertex3dv(fan1[i]);
-		fan1[i][2] -= offset;
-	}
+	p1[0] = C0[8][0];
+	p1[1] = C0[8][1];
+	p1[2] = C0[8][2];
+
+	p2[0] = C0[8][0];
+	p2[1] = C0[8][1];
+	p2[2] = C0[8][2] + offset;
+
+	p3[0] = C0[0][0];
+	p3[1] = C0[0][1];
+	p3[2] = C0[0][2] + offset;
+
+	CalcNormal(p2, p1, p3, n);
+	n[0] *= (-1);
+	n[1] *= (-1);
+	glNormal3dv(n);
+	glVertex3dv(C0[8]);
+	C0[8][2] += offset;
+	glVertex3dv(C0[8]);
+	C0[8][2] -= offset;
+	C0[0][2] += offset;
+	glVertex3dv(C0[0]);
+	C0[0][2] -= offset;
+	glVertex3dv(C0[0]);
 
 	glEnd();
+
+
+
+	//glColor3d(0.4, 0.4, 0.4);
+	
+	//for (i = 0; i < 11; i++)
+	//{
+	//	glVertex3dv(fan1[i]);
+	//	fan1[i][2] += offset;
+	//	glVertex3dv(fan1[i]);
+	//	fan1[i][2] -= offset;
+	//}
+	//for (rot = angle; rot < 67.3801350520; rot += angle)
+	//{
+	//	fan2[i] = rotMatrix(C0[5], rotV1, rot);
+	//	fan2[i + 1][2] += offset;
+	//	n[0] = fan2[i][1] * fan2[i + 1][2] - fan2[i][1] * fan2[i + 1][2];
+	//	n[1] = -fan2[i][0] * fan2[i + 1][2] + fan2[i][0] * fan2[i + 1][2];
+	//	n[2] = fan2[i][0] * fan2[i + 1][1] - fan2[i][0] * fan2[i + 1][1];
+	//	fan2[i + 1][2] -= offset;
+	//	glVertex3dv(fan2[i]);
+	//	fan2[i][2] += offset;
+	//	glVertex3dv(fan2[i]);
+	//	fan2[i][2] -= offset;
+	//}
+
+	//for (i = 0; i < 10; i++)
+	//{
+	//	glVertex3dv(fan2[i]);
+	//	fan2[i][2] += offset;
+	//	glVertex3dv(fan2[i]);
+	//	fan2[i][2] -= offset;
+	//}
+	//
+	//glColor3d(0.2, 0.2, 0.4);
+	//
+	//for (int i = 6; i <= 8; i++)
+	//{
+	//	C0[i + 1][2] += offset;
+	//	n[0] = C0[i][1] * C0[i + 1][2] - C0[i][1] * C0[i + 1][2];
+	//	n[1] = -C0[i][0] * C0[i + 1][2] + C0[i][0] * C0[i + 1][2];
+	//	n[2] = C0[i][0] * C0[i + 1][1] - C0[i][0] * C0[i + 1][1];
+	//	C0[i + 1][2] -= offset;
+	//	glVertex3dv(C0[i]);
+	//	C0[i][2] += offset;
+	//	glVertex3dv(C0[i]);
+	//	C0[i][2] -= offset;
+	//}
+	//
+	//glColor3d(0.4, 0.4, 0.4);
+	//
+	//for (rot = 0; rot >= -180; rot -= 18)
+	//{
+	//	fan1[i] = rotMatrix(C0[8], rotV0, rot);
+	//	//fan1[i + 1][2] += offset;
+	//	//n[0] = fan1[i][1] * fan1[i + 1][2] - fan1[i][1] * fan1[i + 1][2];
+	//	//n[1] = -fan1[i][0] * fan1[i + 1][2] + fan1[i][0] * fan1[i + 1][2];
+	//	//n[2] = fan1[i][0] * fan1[i + 1][1] - fan1[i][0] * fan1[i + 1][1];
+	//	//fan1[i + 1][2] -= offset;
+	//	glVertex3dv(fan1[i]);
+	//	fan1[i][2] += offset;
+	//	glVertex3dv(fan1[i]);
+	//	fan1[i][2] -= offset;
+	//}
+
+	//glEnd();
 
 
    //Сообщение вверху экрана
@@ -567,33 +628,37 @@ void figure(double** C0)
 	glVertex3dv(C0[7]);
 	glVertex3dv(C0[8]);
 
-	glEnd();
-
-	glBegin(GL_TRIANGLE_FAN);
-
-	glVertex3dv(rotV0);
-
-	for (rot = 0; rot <= 180; rot += 18)
-	{
-		pointMod = rotMatrix(C0[0], rotV0, rot);
-		glVertex3dv(pointMod);
-	}
-
-	glEnd();
-
-	glBegin(GL_TRIANGLE_FAN);
-
 	glVertex3dv(C0[9]);
-
-	for (rot = 0; rot <= 67.3801350520; rot += angle)
-	{
-		pointMod = rotMatrix(C0[5], rotV1, rot);
-		glVertex3dv(pointMod);
-	}
-
-	glPopMatrix();
+	glVertex3dv(C0[5]);
+	glVertex3dv(C0[6]);
 
 	glEnd();
+
+	//glBegin(GL_TRIANGLE_FAN);
+	//
+	//glVertex3dv(rotV0);
+	//
+	//for (rot = 0; rot <= 180; rot += 18)
+	//{
+	//	pointMod = rotMatrix(C0[0], rotV0, rot);
+	//	glVertex3dv(pointMod);
+	//}
+	//
+	//glEnd();
+	//
+	//glBegin(GL_TRIANGLE_FAN);
+	//
+	//glVertex3dv(C0[9]);
+	//
+	//for (rot = 0; rot <= 67.3801350520; rot += angle)
+	//{
+	//	pointMod = rotMatrix(C0[5], rotV1, rot);
+	//	glVertex3dv(pointMod);
+	//}
+	//
+	//glPopMatrix();
+	//
+	//glEnd();
 }
 
 double* rotMatrix(double* point, double* pivot, double angle)
@@ -605,4 +670,20 @@ double* rotMatrix(double* point, double* pivot, double angle)
 	pointMod[0] = pointMod[0] + pivot[0];
 	pointMod[1] = pointMod[1] + pivot[1];
 	return pointMod;
+}
+
+void CalcNormal(double x1[3], double x2[3], double x3[3], double* n)
+{
+	double p1[3], p2[3];
+	p1[0] = x2[0] - x1[0];
+	p1[1] = x2[1] - x1[1];
+	p1[2] = x2[2] - x1[2];
+
+	p2[0] = x3[0] - x1[0];
+	p2[1] = x3[1] - x1[1];
+	p2[2] = x3[2] - x1[2];
+
+	n[0] = p1[1] * p2[2] - p2[1] * p1[2];
+	n[1] = (-1) * p1[0] * p2[2] + p2[0] * p1[2];
+	n[2] = p1[0] * p2[1] - p2[0] * p1[1];
 }
